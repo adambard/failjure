@@ -12,7 +12,11 @@
 
 ; Define a failure
 (defrecord Failure [message])
-(def fail ->Failure)
+(defn fail
+ ([msg] (->Failure msg))
+ ([msg & fmt-parts]
+  (->Failure (apply format msg fmt-parts))))
+
 
 ; Exceptions are failures too, make them easier
 (defmacro try* [& body]
@@ -51,10 +55,12 @@
   `(with-meta (fn ~arglist ~@body)
               {:else-fn? true}))
 
+
 (defn- else* [else-part result]
   (if (:else-fn? (meta else-part))
     (else-part result)
     else-part))
+
 
 (defmacro attempt-all
   ([bindings return] `(domonad error-m ~bindings ~return))
@@ -108,7 +114,16 @@
             (attempt-all [x "O"
                           y (try* (Integer/parseInt "k"))
                           z (fail "Another failure")]
-                         (str x y))))
+                         (str x y z))))
+
+      ; Runs if-failed
+      (is (= "Fail"
+             (attempt-all [x "O"
+                           y (fail "Fail")
+                           z "!"]
+                          (str x y z)
+                          (if-failed [e]
+                                     (message e)))))
 
       ; Doesn't interrupt exceptions normally
       (is (= "Caught")
@@ -133,8 +148,7 @@
                ""
                (str "Not OK!")
                (fail)
-               (str "O")
-               (Integer/parseInt)
+               (str "kay-O!")
                (reverse)))))
 
     ; Test attempt->>
