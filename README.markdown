@@ -7,6 +7,12 @@ where functional purity is more important.
 It was inspired by [Andrew Brehaut's error monad](https://brehaut.net/blog/2011/error_monads)
 implementation.
 
+## Installation
+
+Add the following to your build dependencies:
+
+[![Clojars Project](https://img.shields.io/clojars/v/failjure.svg)](https://clojars.org/failjure)
+
 ## Example
 
 ```clojure
