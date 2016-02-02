@@ -2,7 +2,7 @@
   (:require [clojure.algo.monads :refer [domonad defmonad]]))
 
 ; Public API
-; failed, message part of prototype
+; failed?, message part of prototype
 (declare fail)
 (declare attempt-all)
 (declare if-failed)
@@ -56,7 +56,7 @@
               {:else-fn? true}))
 
 
-(defn- else* [else-part result]
+(defn else* [else-part result]
   (if (:else-fn? (meta else-part))
     (else-part result)
     else-part))
