@@ -1,3 +1,5 @@
 .java-version
 .nrepl-history
 target
+.nrepl-port
+src/scratch.clj
