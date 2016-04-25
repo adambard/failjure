@@ -12,6 +12,7 @@ implementation.
 Add the following to your build dependencies:
 
 [![Clojars Project](https://img.shields.io/clojars/v/failjure.svg)](https://clojars.org/failjure)
+[![Travis](https://img.shields.io/travis/adambard/failjure.svg?maxAge=2592000)](https://travis-ci.org/adambard/failjure)
 
 ## Example
 
@@ -37,7 +38,7 @@ Add the following to your build dependencies:
                   id (f/try* (Integer/parseInt (:id data)))]
     {:email email
      :username username}
-    (f/if-failed [e]
+    (f/when-failed [e]
       (log-error (f/message e))
       (handle-error e))))
 ```
@@ -73,13 +74,13 @@ on the first error, returning the failure.
               y (fail "Fail")] x) ; => #Failure{:message "Fail"}
 ```
 
-You can use `if-failed` to provide a function that will handle an error
+You can use `when-failed` to provide a function that will handle an error
 
 ```clojure
 (f/attempt-all [x "Ok"
                 y (fail "Fail")]
   x
-  (f/if-failed [e]
+  (f/when-failed [e]
     (f/message e))) ; => "Fail"
 ```
 
