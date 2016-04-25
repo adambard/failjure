@@ -62,14 +62,14 @@
     ; do something
     (when-failed [e]
       (print \"ERROR:\" (message e))))"
-  {:added "1.0.1"}
+  {:added "0.1.3"}
   [arglist & body]
   `(with-meta (fn ~arglist ~@body)
               {:else-fn? true}))
 
 (defmacro if-failed
   "DEPRECATED: Use when-failed instead"
-  {:deprecated "1.0.1"}
+  {:deprecated "0.1.3"}
   [arglist & body]
   `(with-meta (fn ~arglist ~@body)
               {:else-fn? true}))
