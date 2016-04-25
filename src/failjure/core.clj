@@ -6,6 +6,7 @@
 (declare fail)
 (declare attempt-all)
 (declare if-failed)
+(declare when-failed)
 (declare attempt->)
 (declare attempt->>)
 
@@ -51,10 +52,27 @@
                        (f m)))])
 
 
-(defmacro if-failed [arglist & body]
+(defmacro when-failed
+  "Use in combination with `attempt-all`. If any binding in `attempt-all` failed,
+   run the body given the failure/error as an argument.
+
+  Usage:
+
+  (attempt-all [_ (fail \"Failure\")]
+    ; do something
+    (when-failed [e]
+      (print \"ERROR:\" (message e))))"
+  {:added "1.0.1"}
+  [arglist & body]
   `(with-meta (fn ~arglist ~@body)
               {:else-fn? true}))
 
+(defmacro if-failed
+  "DEPRECATED: Use when-failed instead"
+  {:deprecated "1.0.1"}
+  [arglist & body]
+  `(with-meta (fn ~arglist ~@body)
+              {:else-fn? true}))
 
 (defn else* [else-part result]
   (if (:else-fn? (meta else-part))

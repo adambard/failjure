@@ -4,41 +4,57 @@
 
 (deftest failjure-core-test
     (testing "attempt-all"
-      (is (= "Ok"
-             (attempt-all [x "O"
-                           y "k"]
-                          (str x y))))
+      (testing "basically works"
+        (is (= "Ok"
+               (attempt-all [x "O"
+                             y "k"]
+                            (str x y)))))
 
       ; Fails
-      (is (= (fail "k")
-             (attempt-all [x "O"
-                           y (fail "k")]
-                          (str x y))))
+      (testing "Returns/short-circuits on failures"
+        (is (= (fail "k")
+               (attempt-all [x "O"
+                             y (fail "k")
+                             _ (is false "Did not short-circuit")
+                             ]
+                            (str x y)))))
 
-      ; Returns the exception for try*
-      (is (failed?
-            (attempt-all [x "O"
-                          y (try* (Integer/parseInt "k"))
-                          z (fail "Another failure")]
-                         (str x y z))))
+      (testing "Returns the exception for try*"
+        (let [result (attempt-all [x "O"
+                            y (try* (Integer/parseInt "k"))
+                            z (is false "Did not short-circuit")]
+                           (str x y z))]
+          (is (failed? result))
+          (is (instance? NumberFormatException result))))
 
-      ; Runs if-failed
-      (is (= "Fail"
-             (attempt-all [x "O"
-                           y (fail "Fail")
-                           z "!"]
-                          (str x y z)
-                          (if-failed [e]
-                                     (message e)))))
+      (testing "Runs when-failed"
+        ; Runs when-failed
+        (is (= "Fail"
+               (attempt-all [x "O"
+                             y (fail "Fail")
+                             z "!"]
+                            (str x y z)
+                            (when-failed [e]
+                                         (message e))))))
 
-      ; Doesn't interrupt exceptions normally
-      (is (= "Caught"
-          (try
-            (attempt-all [x "O"
-                          y (Integer/parseInt "k")]
-                         "Ok"
-                         "Failed")
-            (catch Exception e "Caught")))))
+      (testing "Runs if-failed (which is DEPRECATED but still supported)"
+        ; Runs if-failed
+        (is (= "Fail"
+               (attempt-all [x "O"
+                             y (fail "Fail")
+                             z "!"]
+                            (str x y z)
+                            (if-failed [e]
+                                         (message e))))))
+
+      (testing "NumberFormatException"
+        (is (= "Caught"
+               (try
+                 (attempt-all [x "O"
+                               y (Integer/parseInt "k")]
+                              "Ok"
+                              "Failed")
+                 (catch NumberFormatException e "Caught"))))))
 
     ; Test attempt->
     (testing "attempt->"
