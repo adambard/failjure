@@ -23,11 +23,11 @@ Add the following to your build dependencies:
 (defn validate-email [email]
     (if (re-matches #".+@.+\..+" email)
       email
-      (r/fail "Please enter a valid email address (got %s)" email)))
+      (f/fail "Please enter a valid email address (got %s)" email)))
 
 (defn validate-not-empty [s]
   (if (empty? s)
-    (r/fail "Please enter a value")
+    (f/fail "Please enter a value")
     s))
 
 ;; Use attempt-all to handle failures
