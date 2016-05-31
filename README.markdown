@@ -1,5 +1,8 @@
 # Failjure
 
+[![Travis](https://img.shields.io/travis/adambard/failjure.svg?maxAge=2592000)](https://travis-ci.org/adambard/failjure)
+[![Clojars Project](https://img.shields.io/clojars/v/failjure.svg)](https://clojars.org/failjure)
+
 Failjure is a utility library for working with failed computations in Clojure.
 It provides an alternative to exception-based error handling for applications
 where functional purity is more important.
@@ -12,7 +15,6 @@ implementation.
 Add the following to your build dependencies:
 
 [![Clojars Project](https://img.shields.io/clojars/v/failjure.svg)](https://clojars.org/failjure)
-[![Travis](https://img.shields.io/travis/adambard/failjure.svg?maxAge=2592000)](https://travis-ci.org/adambard/failjure)
 
 ## Example
 
