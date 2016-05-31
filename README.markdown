@@ -123,6 +123,20 @@ you can wrap any form or forms in the `try*` macro, which is shorthand for
 Since failjure treats returned exceptions as failures, this can be used
 to adapt exception-throwing functions to failjure-style workflows.
 
+
+### `HasFailed`
+
+`HasFailed` is the protocol that describes a failed result. This library implements
+HasFailed for Object (the catch-all not-failed implementation), Exception, and the
+built-in Failure record type, but you can add your own very easily:
+
+```clojure
+(defrecord AnnotatedFailure [message data]
+  f/HasFailed
+  (failed? [self] true)
+  (message [self] (:message self)))
+```
+
 ## License
 
 Copyright 2016 [Adam Bard](https://adambard.com/) and [Andrew Brehaut](https://brehaut.net/)
