@@ -87,4 +87,17 @@
                (str "Not OK!")
                (fail)
                (str "O")
-               (reverse))))))
+               (reverse)))))
+    
+    (testing "failed?"
+      (testing "failed? is valid on nullable"
+        (is (false? (failed? nil)))
+        (is (= "nil" (message nil))))
+
+      (testing "failed? is valid on exception"
+        (is (true? (failed? (Exception. "Failed"))))
+        (is (= "My Message" (message (Exception. "My Message")))))
+
+      (testing "failed? is valid on failure"
+        (is (true? (failed? (fail "You failed."))))
+        (is (= "You failed." (message (fail "You failed.")))))))

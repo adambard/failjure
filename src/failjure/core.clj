@@ -32,6 +32,10 @@
 
 
 (extend-protocol HasFailed
+  nil
+  (failed? [self] false)
+  (message [self] "nil")
+
   Object
   (failed? [self] false)
   (message [self] (str self))
