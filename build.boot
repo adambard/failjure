@@ -14,7 +14,7 @@
 (bootlaces! +version+)
 
 (task-options!
-  pom {:project        'failjure
+  pom {:project        'org.clojars.sherpc/failjure
        :version        +version+
        :description    "Simple helpers for treating failures as values"
        :url            "https://github.com/flocktory/failjure"
