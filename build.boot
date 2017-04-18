@@ -10,15 +10,15 @@
 (require '[adzerk.bootlaces :refer :all]
          '[adzerk.boot-test :refer :all])
 
-(def +version+ "0.1.5")
+(def +version+ "0.1.4")
 (bootlaces! +version+)
 
 (task-options!
-  pom {:project        'org.clojars.sherpc/failjure
+  pom {:project        'failjure
        :version        +version+
        :description    "Simple helpers for treating failures as values"
-       :url            "https://github.com/flocktory/failjure"
-       :scm            {:url "https://github.com/flocktory/failjure"}
+       :url            "https://github.com/adambard/failjure"
+       :scm            {:url "https://github.com/adambard/failjure"}
        :license        {"Eclipse Public License" "http://www.eclipse.org/legal/epl-v10.html"}})
 
 (deftask deploy-clojars []

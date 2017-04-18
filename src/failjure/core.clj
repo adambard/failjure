@@ -1,6 +1,5 @@
 (ns failjure.core
-  (:require [clojure.algo.monads :refer [domonad defmonad]]
-            [failjure.core :as f]))
+  (:require [clojure.algo.monads :refer [domonad defmonad]]))
 
 ; Public API
 ; failed?, message part of prototype
