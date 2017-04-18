@@ -1,5 +1,6 @@
 (ns failjure.core
-  (:require [clojure.algo.monads :refer [domonad defmonad]]))
+  (:require [clojure.algo.monads :refer [domonad defmonad]]
+            [failjure.core :as f]))
 
 ; Public API
 ; failed?, message part of prototype
@@ -95,17 +96,22 @@
 
 (defmacro attempt->
   ([start] start)
-  ([start form] `(domonad error-m [x# (-> ~start ~form)] x#))
+  ([start form]
+   `(if (failed? ~start)
+      ~start
+      (domonad error-m [x# (-> ~start ~form)] x#)))
   ([start form & forms]
    `(let [new-start# (attempt-> ~start ~form)]
       (if (failed? new-start#)
         new-start#
         (attempt-> new-start# ~@forms)))))
 
-
 (defmacro attempt->>
   ([start] start)
-  ([start form] `(domonad error-m [x# (->> ~start ~form)] x#))
+  ([start form]
+   `(if (failed? ~start)
+      ~start
+      (domonad error-m [x# (->> ~start ~form)] x#)))
   ([start form & forms]
    `(let [new-start# (attempt->> ~start ~form)]
       (if (failed? new-start#)
