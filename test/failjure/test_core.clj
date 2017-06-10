@@ -56,17 +56,17 @@
                               "Failed")
                  (catch NumberFormatException e "Caught"))))))
 
-    ; Test attempt->
-    (testing "attempt->"
+    ; Test ok-> (and therefore attempt->)
+    (testing "ok->"
       (is (= "Ok!"
-          (attempt->
+          (ok->
             ""
             (str "O")
             (str "k")
             (str "!")))) 
 
       (is (= (fail "Not OK!")
-             (attempt->
+             (ok->
                ""
                (str "Not OK!")
                (fail)
@@ -76,13 +76,13 @@
     ; Test attempt->>
     (testing "attempt->>"
       (is (= "Ok"
-          (attempt->>
+          (ok->>
             ""
             (str "k")
             (str "O")))) 
 
       (is (= (fail "Not OK!")
-             (attempt->>
+             (ok->>
                ""
                (str "Not OK!")
                (fail)
@@ -100,4 +100,77 @@
 
       (testing "failed? is valid on failure"
         (is (true? (failed? (fail "You failed."))))
-        (is (= "You failed." (message (fail "You failed.")))))))
+        (is (= "You failed." (message (fail "You failed."))))))
+    
+    (testing "if-let-ok?"
+
+      (is (= "Hello"
+             (if-let-ok? [v "Hello"] v)))
+
+      (is (failed?
+            (if-let-ok? [v (fail "FAIL")] "OK")))
+
+      (is (= "Hello"
+             (if-let-ok? [v :ok] "Hello" "Goodbye")))
+
+      (is (= "Goodbye"
+             (if-let-ok? [v (fail "Hello")] "Hello" "Goodbye")))
+      )
+
+    (testing "when-let-ok?"
+      (let [result (atom nil)]
+        (is (= "Hello"
+               (when-let-ok? [v "Hello"]
+                 (reset! result :ok)
+                 v)))
+        (is (= :ok @result)))
+
+      (let [result (atom nil)]
+        (is (failed?
+              (when-let-ok? [v (fail "FAIL")]
+                (reset! result :ok)
+                "OK")))
+        (is (nil? @result))
+        )
+      )
+
+    (testing "if-let-failed?"
+
+      (is (= "Hello"
+             (if-let-failed? [v "Hello"] "FAILED" v)))
+
+      (is (failed?
+            (if-let-failed? [v (fail "FAIL")] v)))
+
+      (is (ok?
+            (if-let-failed? [v "Didn't fail"] v)))
+
+      (is (= "Goodbye"
+             (if-let-failed? [v :ok] "Hello" "Goodbye")))
+
+      (is (= "Hello"
+             (if-let-failed? [v (fail "Hello")] "Hello" "Goodbye")))
+      )
+
+    (testing "when-let-failed?"
+      (let [result (atom nil)]
+        (is (= "Hello"
+              (when-let-failed?
+                [v "Hello"]
+                (reset! result :ok)
+                v)))
+        (is (nil? @result)))
+
+      (let [result (atom nil)]
+        (is (= "OK"
+              (when-let-failed?
+                [v (fail "FAIL")]
+                (reset! result :ok)
+                "OK")))
+        (is (= :ok @result))))
+)
+
+
+(comment
+  (run-tests)
+  )

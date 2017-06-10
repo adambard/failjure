@@ -76,7 +76,7 @@ on the first error, returning the failure.
               y (fail "Fail")] x) ; => #Failure{:message "Fail"}
 ```
 
-You can use `when-failed` to provide a function that will handle an error
+You can use `when-failed` to provide a function that will handle an error:
 
 ```clojure
 (f/attempt-all [x "Ok"
@@ -86,13 +86,17 @@ You can use `when-failed` to provide a function that will handle an error
     (f/message e))) ; => "Fail"
 ```
 
-### `attempt->` and `attempt->>`
+### `ok->` and `ok->>`
 
 If you're on-the-ball enough that you can represent your problem
 as a series of compositions, you can use these threading macros
 instead. Each form is applied to the output of the previous
-as in `->` and `->>`, except that a failure value is short-circuited
-and returned immediately.
+as in `->` and `->>` (or, more accurately, `some->` and `some->>`),
+ except that a failure value is short-circuited and returned immediately.
+
+*Previous versions of failjure used `attempt->` and `attempt->>`, which
+do not short-circuit if the starting value is a failure. `ok->` and `ok->>`
+correct this shortcoming*
 
 ```clojure
 
@@ -101,12 +105,12 @@ and returned immediately.
     (f/fail "Value required for %s" field)
     data))
 
-(let [result (f/attempt->
+(let [result (f/ok->
               data
               (validate-non-blank :username)
               (validate-non-blank :password)
               (save-data))]
-  (when (f/failed? attempt)
+  (when (f/failed? result)
     (log (f/message result))
     (handle-failure result)))
 ```
@@ -114,7 +118,7 @@ and returned immediately.
 ### `try*`
 
 This library does not handle exceptions by default. However,
-you can wrap any form or forms in the `try*` macro, which is shorthand for
+you can wrap any form or forms in the `try*` macro, which is shorthand for:
 
 ```clojure
 (try
@@ -138,6 +142,20 @@ built-in Failure record type, but you can add your own very easily:
   (failed? [self] true)
   (message [self] (:message self)))
 ```
+
+## Changelog
+
+#### 1.0.1
+
+This version is fully backwards-compatible with 0.1.4, but failjure
+ has been in use long enough to be considered stable. Also I added
+a .1 because nobody trusts v1.0.0.
+
+* Added `ok?`, `ok->`, `ok->>`, `if-let-ok?`, `when-let-ok?`, `if-let-failed?` and `when-let-failed?`
+
+#### 0.1.4
+
+* Added changelog.
 
 ## License
 
