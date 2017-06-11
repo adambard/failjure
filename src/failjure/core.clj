@@ -185,18 +185,23 @@
 (defmacro attempt->
   "Deprecated. Use ok-> instead."
   ([start] start)
-  ([start form] `(domonad error-m [x# (-> ~start ~form)] x#))
+  ([start form]
+   `(if (failed? ~start)
+      ~start
+      (domonad error-m [x# (-> ~start ~form)] x#)))
   ([start form & forms]
    `(let [new-start# (attempt-> ~start ~form)]
       (if (failed? new-start#)
         new-start#
         (attempt-> new-start# ~@forms)))))
 
-
 (defmacro attempt->>
   "Deprecated. Use ok->> instead."
   ([start] start)
-  ([start form] `(domonad error-m [x# (->> ~start ~form)] x#))
+  ([start form]
+   `(if (failed? ~start)
+      ~start
+      (domonad error-m [x# (->> ~start ~form)] x#)))
   ([start form & forms]
    `(let [new-start# (attempt->> ~start ~form)]
       (if (failed? new-start#)

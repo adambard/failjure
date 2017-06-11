@@ -63,7 +63,7 @@
             ""
             (str "O")
             (str "k")
-            (str "!")))) 
+            (str "!"))))
 
       (is (= (fail "Not OK!")
              (ok->
@@ -71,7 +71,15 @@
                (str "Not OK!")
                (fail)
                (str "kay-O!")
-               (reverse)))))
+               (reverse))))
+
+      (is (= (fail "Not OK!")
+             (attempt->
+              (fail "Not OK!")
+              (str "Not OK!")
+              (fail)
+              (str "kay-O!")
+              (reverse)))))
 
     ; Test attempt->>
     (testing "attempt->>"
@@ -79,7 +87,7 @@
           (ok->>
             ""
             (str "k")
-            (str "O")))) 
+            (str "O"))))
 
       (is (= (fail "Not OK!")
              (ok->>
@@ -87,7 +95,15 @@
                (str "Not OK!")
                (fail)
                (str "O")
-               (reverse)))))
+               (reverse))))
+
+      (is (= (fail "Not OK!")
+             (attempt->>
+              (fail "Not OK!")
+              (str "Not OK!")
+              (fail)
+              (str "O")
+              (reverse)))))
     
     (testing "failed?"
       (testing "failed? is valid on nullable"
