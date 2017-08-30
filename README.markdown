@@ -143,7 +143,7 @@ built-in Failure record type, but you can add your own very easily:
   (message [self] (:message self)))
 ```
 
-### `(if-|when-)-let-(ok?|failed?)
+### `(if-|when-)-let-(ok?|failed?)`
 
 Failjure provides the helpers `if-let-ok?`, `if-let-failed?`, `when-let-ok?` and `when-let-failed?` to help
 with branching. Each has the same basic structure:
