@@ -168,7 +168,14 @@
                 (reset! result :ok)
                 "OK")))
         (is (= :ok @result))))
-)
+
+  (testing "Assertions"
+    ;; assert-some? basically covers everything
+    (testing "Assert some?"
+      (is (= (fail "msg") (assert-some? nil "msg")))
+      (is (= "it" (assert-some? "it" "msg"))))))
+
+
 
 
 (comment

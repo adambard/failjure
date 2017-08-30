@@ -143,7 +143,52 @@ built-in Failure record type, but you can add your own very easily:
   (message [self] (:message self)))
 ```
 
+### `(if-|when-)-let-(ok?|failed?)
+
+Failjure provides the helpers `if-let-ok?`, `if-let-failed?`, `when-let-ok?` and `when-let-failed?` to help
+with branching. Each has the same basic structure:
+
+```clojure
+(f/if-let-failed? [x (something-which-may-fail)]
+  (handle-failure x)
+  (handle-success x))
+```
+
+* If no else is provided, the `if-` variants will return the value of x
+* The `when-` variants will always return the value of x
+
+### `assert-with`
+
+The `assert-with` helper is a very basic way of adapting non-failjure-aware
+functions/values to a failure context. The source is simply:
+
+```clojure
+(defn assert-with
+  "If (pred v) is true, return v
+   otherwise, return (f/fail msg)"
+  [pred v msg]
+  (if (pred v) v (fail msg)))
+```
+
+The usage looks like this:
+
+```clojure
+(f/attempt-all
+  [x (f/assert-with some? (some-fn) "some-fn failed!")
+   y (f/assert-with integer? (some-integer-returning-fn) "Not an integer.")]
+  (handle-success x)
+  (f/when-failed [e] (handle-failure e)))
+```
+
+The pre-packaged helpers `assert-some?`, `assert-nil?`, `assert-not-nil?`, `assert-not-empty?`, and `assert-number?`
+are provided, but if you like, adding your own is as easy as `(def assert-my-pred? (partial f/assert-with my-pred?))`.
+
+
 ## Changelog
+
+#### 1.1.0
+
+Added assert helpers
 
 #### 1.0.1
 

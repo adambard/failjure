@@ -218,3 +218,17 @@
    `(if (failed? ~start)
       ~start
       (attempt->> ~start ~@forms))))
+
+;; Assertions: Helpers
+
+(defn assert-with
+  "If (pred v) is true, return v
+   otherwise, return (f/fail msg)"
+  [pred v msg]
+  (if (pred v) v (fail msg)))
+
+(def assert-some? (partial assert-with some?))
+(def assert-nil? (partial assert-with nil?))
+(def assert-not-nil? assert-some?)
+(def assert-not-empty? (partial assert-with (comp not empty?)))
+(def assert-number? (partial assert-with number?))
