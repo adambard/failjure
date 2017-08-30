@@ -16,6 +16,11 @@ Add the following to your build dependencies:
 
 [![Clojars Project](https://img.shields.io/clojars/v/failjure.svg)](https://clojars.org/failjure)
 
+You can also include the specs via the [failjure-spec](https://github.com/adambard/failjure-spec) project,
+if you're into that sort of thing:
+
+[![Clojars Project](https://img.shields.io/clojars/v/failjure-spec.svg)](https://clojars.org/failjure-spec)
+
 ## Example
 
 ```clojure
