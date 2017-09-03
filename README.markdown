@@ -191,6 +191,10 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 ## Changelog
 
+#### 1.2.0
+
+Refactored `attempt-all`, `attempt->`, and `attempt->>` to remove dependency on monads
+
 #### 1.1.0
 
 Added assert helpers
