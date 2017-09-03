@@ -1,7 +1,6 @@
 (set-env!
   :source-paths #{"src" "test"}
   :dependencies '[[org.clojure/clojure "1.7.0" :scope "provided"]
-                  [org.clojure/algo.monads "0.1.6"]
 
                   [adzerk/bootlaces "0.1.13" :scope "test"]
                   [adzerk/boot-test "1.1.1" :scope "test"]])

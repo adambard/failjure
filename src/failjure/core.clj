@@ -1,5 +1,4 @@
-(ns failjure.core
-  (:require [clojure.algo.monads :refer [domonad defmonad]]))
+(ns failjure.core)
 
 ; Public API
 ; failed?, message part of protocol
@@ -70,7 +69,9 @@
     (if-let-ok? [v (fail \"Goodbye\")]
       \"Hello\")
     ;; Returns #failjure.core.Failure{:message \"Goodbye\"}
-  "
+
+  Note that the above is identical in function to simply calling
+  (fail \"Goodbye\")"
   ([[v-sym form] ok-branch]
    `(if-let-ok? [~v-sym ~form] ~ok-branch ~v-sym))
   ([[v-sym form] ok-branch failed-branch]
@@ -123,11 +124,6 @@
 
 
 
-(defmonad error-m
-  [m-result identity
-   m-bind   (fn [m f] (if (failed? m)
-                       m
-                       (f m)))])
 
 
 
@@ -159,6 +155,18 @@
     else-part))
 
 
+(defn- attempt-all*
+  "Rearrange the bindings into a pyramid of `if-let-failed?` calls"
+  [bindings body]
+  (->> bindings
+       (partition 2)
+       (reverse)
+       (reduce (fn [inner [bind body]]
+                 `(if-let-failed? [~bind ~body]
+                    ~bind
+                    ~inner))
+               body)))
+
 (defmacro attempt-all
   "Used like `let`, but short-circuits in case of
   a failed binding. Can be used in combination with when-failed
@@ -174,34 +182,31 @@
 
   "
   ([bindings return]
-   `(domonad error-m ~bindings ~return))
+   (attempt-all* bindings return))
   ([bindings return else]
-   `(let [result# (attempt-all ~bindings ~return)]
-      (if (failed? result#)
-        (else* ~else result#)
-        result#))))
+   `(if-let-failed? [result# (attempt-all ~bindings ~return)]
+                    (else* ~else result#)
+                    result#)))
 
 
 (defmacro attempt->
   "Deprecated. Use ok-> instead."
   ([start] start)
-  ([start form] `(domonad error-m [x# (-> ~start ~form)] x#))
+  ([start form] `(-> ~start ~form))
   ([start form & forms]
-   `(let [new-start# (attempt-> ~start ~form)]
-      (if (failed? new-start#)
-        new-start#
-        (attempt-> new-start# ~@forms)))))
+   `(if-let-failed? [new-start# (attempt-> ~start ~form)]  
+      new-start#
+      (attempt-> new-start# ~@forms))))
 
 
 (defmacro attempt->>
   "Deprecated. Use ok->> instead."
   ([start] start)
-  ([start form] `(domonad error-m [x# (->> ~start ~form)] x#))
+  ([start form] `(->> ~start ~form))
   ([start form & forms]
-   `(let [new-start# (attempt->> ~start ~form)]
-      (if (failed? new-start#)
-        new-start#
-        (attempt->> new-start# ~@forms)))))
+   `(if-let-failed? [new-start# (attempt->> ~start ~form)]
+      new-start#
+      (attempt->> new-start# ~@forms))))
 
 (defmacro ok->
   "Like some->, but with ok? instead of some?
