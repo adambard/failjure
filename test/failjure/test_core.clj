@@ -82,7 +82,7 @@
         (is (= 3
                (ok->>
                  (swap! a inc)
-                 inc))))
+                 inc)))))
 
     ; Test attempt->>
     (testing "ok->>"
