@@ -71,10 +71,21 @@
                (str "Not OK!")
                (fail)
                (str "kay-O!")
-               (reverse)))))
+               (reverse))))
+      
+      ; Ensure the double-eval bug goes away
+      (let [a (atom 0)]
+        (is (= 2
+               (ok->
+                 (swap! a inc)
+                 inc)))
+        (is (= 3
+               (ok->>
+                 (swap! a inc)
+                 inc))))
 
     ; Test attempt->>
-    (testing "attempt->>"
+    (testing "ok->>"
       (is (= "Ok"
           (ok->>
             ""

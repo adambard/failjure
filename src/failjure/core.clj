@@ -212,17 +212,17 @@
   "Like some->, but with ok? instead of some?
    (i.e., short-circuits when it encounters a failure)"
   ([start & forms]
-   `(if (failed? ~start)
-      ~start
-      (attempt-> ~start ~@forms))))
+   `(if-let-failed? [v# ~start]
+      v#
+      (attempt-> v# ~@forms))))
 
 (defmacro ok->>
   "Like some->>, but with ok? instead of some?
    (i.e., short-circuits when it encounters a failure)"
   ([start & forms]
-   `(if (failed? ~start)
-      ~start
-      (attempt->> ~start ~@forms))))
+   `(if-let-failed? [v# ~start]
+      v#
+      (attempt->> v# ~@forms))))
 
 ;; Assertions: Helpers
 
