@@ -60,7 +60,19 @@
         (is (= (fail "Fail")
                (attempt-all [x "1"
                              {:keys [y]} (fail "Fail")]
-                y)))))
+                 y))))
+
+      (testing "try-all safely catches an exception in the bindings"
+        (is (failed? (try-all [x (/ 4 0)
+                               y (+ 3 4)]
+                              (+ x y)))))
+
+      (testing "try-all safely catches an exception in the bindings with else clause"
+        (is (= "Divide by zero"
+               (try-all [x (/ 4 0)
+                         y (+ 3 4)]
+                        (+ x y)
+                        (when-failed [err] (message err)))))))
 
     ; Test ok-> (and therefore attempt->)
     (testing "ok->"
@@ -69,7 +81,7 @@
             ""
             (str "O")
             (str "k")
-            (str "!")))) 
+            (str "!"))))
 
       (is (= (fail "Not OK!")
              (ok->
@@ -78,7 +90,7 @@
                (fail)
                (str "kay-O!")
                (reverse))))
-      
+
       ; Ensure the double-eval bug goes away
       (let [a (atom 0)]
         (is (= 2
@@ -96,7 +108,7 @@
           (ok->>
             ""
             (str "k")
-            (str "O")))) 
+            (str "O"))))
 
       (is (= (fail "Not OK!")
              (ok->>
@@ -105,7 +117,7 @@
                (fail)
                (str "O")
                (reverse)))))
-    
+
     (testing "failed?"
       (testing "failed? is valid on nullable"
         (is (false? (failed? nil)))
@@ -118,7 +130,7 @@
       (testing "failed? is valid on failure"
         (is (true? (failed? (fail "You failed."))))
         (is (= "You failed." (message (fail "You failed."))))))
-    
+
     (testing "if-let-ok?"
 
       (is (= "Hello"

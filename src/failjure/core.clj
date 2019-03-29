@@ -165,8 +165,8 @@
        (reduce (fn [inner [bind body]]
                  `(let [result# ~body]
                     (if-let-failed? [~bind result#]
-                     result#
-                     ~inner)))
+                      result#
+                      ~inner)))
                body)))
 
 (defmacro attempt-all
@@ -190,13 +190,30 @@
                     (else* ~else result#)
                     result#)))
 
+(defn- try-wrap
+  [bindings]
+  (map-indexed #(if (odd? %1)
+                  `(try* ~%2)
+                  %2)
+               bindings))
+
+(defmacro try-all
+  "Similar to `attempt-all` but catches possible exceptions.
+
+  Wraps each arm of the binding in a `try*` to treat them as Failures and short circuit."
+  ([bindings return]
+   (attempt-all* (try-wrap bindings) return))
+  ([bindings return else]
+   `(if-let-failed? [result# (try-all ~bindings ~return)]
+      (else* ~else result#)
+      result#)))
 
 (defmacro attempt->
   "Deprecated. Use ok-> instead."
   ([start] start)
   ([start form] `(-> ~start ~form))
   ([start form & forms]
-   `(if-let-failed? [new-start# (attempt-> ~start ~form)]  
+   `(if-let-failed? [new-start# (attempt-> ~start ~form)]
       new-start#
       (attempt-> new-start# ~@forms))))
 
