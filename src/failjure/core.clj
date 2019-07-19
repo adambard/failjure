@@ -73,10 +73,11 @@
   Note that the above is identical in function to simply calling
   (fail \"Goodbye\")"
   ([[v-sym form] ok-branch]
-   `(if-let-ok? [~v-sym ~form] ~ok-branch ~v-sym))
+    `(let [result# ~form]
+      (if-let-ok? [~v-sym result#] ~ok-branch result#)))
   ([[v-sym form] ok-branch failed-branch]
    `(let [~v-sym ~form]
-      (if (ok? ~v-sym)
+      (if (ok? ~form)
         ~ok-branch
         ~failed-branch))))
 
@@ -194,7 +195,7 @@
   ([start] start)
   ([start form] `(-> ~start ~form))
   ([start form & forms]
-   `(if-let-failed? [new-start# (attempt-> ~start ~form)]  
+   `(if-let-failed? [new-start# (attempt-> ~start ~form)]
       new-start#
       (attempt-> new-start# ~@forms))))
 
@@ -212,9 +213,9 @@
   "Like some->, but with ok? instead of some?
    (i.e., short-circuits when it encounters a failure)"
   ([start & forms]
-   `(if-let-failed? [v# ~start]
-      v#
-      (attempt-> v# ~@forms))))
+   `(if-let-failed? [v1# ~start]
+      v1#
+      (ok-> v1# ~@forms))))
 
 (defmacro ok->>
   "Like some->>, but with ok? instead of some?
@@ -222,7 +223,7 @@
   ([start & forms]
    `(if-let-failed? [v# ~start]
       v#
-      (attempt->> v# ~@forms))))
+      (ok->> v# ~@forms))))
 
 ;; Assertions: Helpers
 
