@@ -54,7 +54,13 @@
                                y (Integer/parseInt "k")]
                               "Ok"
                               "Failed")
-                 (catch NumberFormatException e "Caught"))))))
+                 (catch NumberFormatException e "Caught")))))
+
+      (testing "Destructuring in fail cases should return the failure"
+        (is (= (fail "Fail")
+               (attempt-all [x "1"
+                             {:keys [y]} (fail "Fail")]
+                y)))))
 
     ; Test ok-> (and therefore attempt->)
     (testing "ok->"
@@ -126,7 +132,10 @@
 
       (is (= "Goodbye"
              (if-let-ok? [v (fail "Hello")] "Hello" "Goodbye")))
-      )
+
+      (is (= (fail "Fail")
+                (if-let-failed? [{:keys [y]} (fail "Something went wrong!")]
+                              (fail "Fail")))))
 
     (testing "when-let-ok?"
       (let [result (atom nil)]

@@ -73,10 +73,12 @@
   Note that the above is identical in function to simply calling
   (fail \"Goodbye\")"
   ([[v-sym form] ok-branch]
-   `(if-let-ok? [~v-sym ~form] ~ok-branch ~v-sym))
+   `(let [result# ~form]
+     (if-let-ok? [~v-sym result#] ~ok-branch result#)))
   ([[v-sym form] ok-branch failed-branch]
-   `(let [~v-sym ~form]
-      (if (ok? ~v-sym)
+   `(let [result# ~form
+          ~v-sym result#]
+      (if (ok? result#)
         ~ok-branch
         ~failed-branch))))
 
@@ -162,9 +164,10 @@
        (partition 2)
        (reverse)
        (reduce (fn [inner [bind body]]
-                 `(if-let-failed? [~bind ~body]
-                    ~bind
-                    ~inner))
+                 `(let [result# ~body]
+                    (if-let-failed? [~bind result#]
+                     result#
+                     ~inner)))
                body)))
 
 (defmacro attempt-all
