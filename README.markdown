@@ -191,6 +191,14 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 ## Changelog
 
+#### 1.4.0
+
+Resolved issues caused by attempting to destructure failed results.
+
+#### 1.3.0
+
+Fix bug where `ok->/>` would sometimes double-eval initial argument.
+
 #### 1.2.0
 
 Refactored `attempt-all`, `attempt->`, and `attempt->>` to remove dependency on monads

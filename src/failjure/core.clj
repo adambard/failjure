@@ -63,8 +63,7 @@
       (do-something-on-failure v))
 
   Note that the value of v is the result of something-which-may-fail
-  in either case. If no else branch is provided, nil is returned
-  is returned:
+  in either case. If no else branch is provided, nil is returned:
 
     (if-let-ok? [v (fail \"Goodbye\")]
       \"Hello\")
