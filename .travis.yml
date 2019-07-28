@@ -1,6 +1,6 @@
 language: clojure
 jdk:
-    - oraclejdk9
+    - oraclejdk10
 install:
     - wget -O boot https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh
     - chmod 755 boot
