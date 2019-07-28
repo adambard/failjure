@@ -134,6 +134,16 @@ you can wrap any form or forms in the `try*` macro, which is shorthand for:
 Since failjure treats returned exceptions as failures, this can be used
 to adapt exception-throwing functions to failjure-style workflows.
 
+### `try-all`
+
+A version of `attempt-all` which automatically wraps each right side of its
+bindings in a `try*` is available as `try-all` (thanks @lispyclouds):
+
+```clojure
+(try-all [x (/ 1 0)
+          y (* 2 3)]
+  y)  ; => java.lang.ArithmeticException (returned, not thrown)
+```
 
 ### `HasFailed`
 
@@ -190,6 +200,10 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 
 ## Changelog
+
+#### 1.5.0
+
+Added `try-all` feature
 
 #### 1.4.0
 
