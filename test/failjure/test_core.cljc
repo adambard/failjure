@@ -1,165 +1,181 @@
 (ns failjure.test-core
-  (:require [clojure.test :refer :all]
-            [failjure.core :refer :all]))
+  (:require #?@(:clj [[clojure.test :refer :all]
+                      [failjure.core :as f]]
+                :cljs [[cljs.test :refer-macros [deftest testing is]]
+                       [failjure.core :as f :include-macros true]])))
 
 (deftest failjure-core-test
-    (testing "attempt-all"
-      (testing "basically works"
-        (is (= "Ok"
-               (attempt-all [x "O"
+  (testing "attempt-all"
+    (testing "basically works"
+      (is (= "Ok"
+             (f/attempt-all [x "O"
                              y "k"]
                             (str x y)))))
 
-      ; Fails
-      (testing "Returns/short-circuits on failures"
-        (is (= (fail "k")
-               (attempt-all [x "O"
-                             y (fail "k")
+                                        ; Fails
+    (testing "Returns/short-circuits on failures"
+      (is (= (f/fail "k")
+             (f/attempt-all [x "O"
+                             y (f/fail "k")
                              _ (is false "Did not short-circuit")
                              ]
                             (str x y)))))
 
-      (testing "Returns the exception for try*"
-        (let [result (attempt-all [x "O"
-                            y (try* (Integer/parseInt "k"))
-                            z (is false "Did not short-circuit")]
-                           (str x y z))]
-          (is (failed? result))
-          (is (instance? NumberFormatException result))))
+    #?(:clj
+       (testing "Returns the exception for try*"
+         (let [result (f/attempt-all [x "O"
+                                    y (f/try* (Integer/parseInt "k"))
+                                    z (is false "Did not short-circuit")]
+                                   (str x y z))]
+           (is (f/failed? result))
+           (is (instance? NumberFormatException result))))
+       :cljs
+       (testing "Returns the error for try-cljs*"
+         (let [result (f/attempt-all [x 0
+                                      y (f/try-cljs* (throw (js/Error. "Fails")))
+                                      z (is false "Did not short-circuit")]
+                                     (str x y z))]
+           (is (f/failed? result))
+           (is (instance? js/Error result)))))
 
-      (testing "Runs when-failed"
-        ; Runs when-failed
-        (is (= "Fail"
-               (attempt-all [x "O"
-                             y (fail "Fail")
-                             z "!"]
-                            (str x y z)
-                            (when-failed [e]
-                                         (message e))))))
+    (testing "Runs when-failed"
+                                        ; Runs when-failed
+      (is (= "Fail"
+             (f/attempt-all [x "O"
+                           y (f/fail "Fail")
+                           z "!"]
+                          (str x y z)
+                          (f/when-failed [e]
+                            (f/message e))))))
 
-      (testing "Runs if-failed (which is DEPRECATED but still supported)"
-        ; Runs if-failed
-        (is (= "Fail"
-               (attempt-all [x "O"
-                             y (fail "Fail")
-                             z "!"]
-                            (str x y z)
-                            (if-failed [e]
-                                         (message e))))))
+    (testing "Runs if-failed (which is DEPRECATED but still supported)"
+                                        ; Runs if-failed
+      (is (= "Fail"
+             (f/attempt-all [x "O"
+                           y (f/fail "Fail")
+                           z "!"]
+                          (str x y z)
+                          (f/if-failed [e]
+                            (f/message e))))))
 
-      (testing "NumberFormatException"
-        (is (= "Caught"
-               (try
-                 (attempt-all [x "O"
-                               y (Integer/parseInt "k")]
-                              "Ok"
-                              "Failed")
-                 (catch NumberFormatException e "Caught")))))
+    #?(:clj
+       (testing "NumberFormatException"
+         (is (= "Caught"
+                (try
+                  (f/attempt-all [x "O"
+                                y (Integer/parseInt "k")]
+                               "Ok"
+                               "Failed")
+                  (catch NumberFormatException e "Caught"))))))
 
-      (testing "Destructuring in fail cases should return the failure"
-        (is (= (fail "Fail")
-               (attempt-all [x "1"
-                             {:keys [y]} (fail "Fail")]
-                 y))))
+    (testing "Destructuring in fail cases should return the failure"
+      (is (= (f/fail "Fail")
+             (f/attempt-all [x "1"
+                           {:keys [y]} (f/fail "Fail")]
+                          y))))
 
-      (testing "try-all safely catches an exception in the bindings"
-        (is (failed? (try-all [x (/ 4 0)
-                               y (+ 3 4)]
-                              (+ x y)))))
+    #?(:clj
+       (testing "try-all safely catches an exception in the bindings"
+         (is (f/failed? (f/try-all [x (/ 4 0)
+                                    y (+ 3 4)]
+                                   (+ x y))))))
 
-      (testing "try-all safely catches an exception in the bindings with else clause"
-        (is (= "Divide by zero"
-               (try-all [x (/ 4 0)
-                         y (+ 3 4)]
-                        (+ x y)
-                        (when-failed [err] (message err)))))))
+    #?(:clj
+       (testing "try-all safely catches an exception in the bindings with else clause"
+         (is (= "Divide by zero"
+                (f/try-all [x (/ 4 0)
+                            y (+ 3 4)]
+                           (+ x y)
+                           (f/when-failed [err] (f/message err))))))))
 
-    ; Test ok-> (and therefore attempt->)
-    (testing "ok->"
-      (is (= "Ok!"
-          (ok->
+                                        ; Test ok-> (and therefore attempt->)
+  (testing "ok->"
+    (is (= "Ok!"
+           (f/ok->
             ""
             (str "O")
             (str "k")
             (str "!"))))
 
-      (is (= (fail "Not OK!")
-             (ok->
-               ""
-               (str "Not OK!")
-               (fail)
-               (str "kay-O!")
-               (reverse))))
+    (is (= (f/fail "Not OK!")
+           (f/ok->
+            ""
+            (str "Not OK!")
+            (f/fail)
+            (str "kay-O!")
+            (reverse))))
 
-      ; Ensure the double-eval bug goes away
-      (let [a (atom 0)]
-        (is (= 2
-               (ok->
-                 (swap! a inc)
-                 inc)))
-        (is (= 3
-               (ok->>
-                 (swap! a inc)
-                 inc)))))
+                                        ; Ensure the double-eval bug goes away
+    (let [a (atom 0)]
+      (is (= 2
+             (f/ok->
+              (swap! a inc)
+              inc)))
+      (is (= 3
+             (f/ok->>
+              (swap! a inc)
+              inc)))))
 
-    ; Test attempt->>
-    (testing "ok->>"
-      (is (= "Ok"
-          (ok->>
+                                        ; Test attempt->>
+  (testing "ok->>"
+    (is (= "Ok"
+          (f/ok->>
             ""
             (str "k")
             (str "O"))))
 
-      (is (= (fail "Not OK!")
-             (ok->>
+      (is (= (f/fail "Not OK!")
+             (f/ok->>
                ""
                (str "Not OK!")
-               (fail)
+               (f/fail)
                (str "O")
                (reverse)))))
 
     (testing "failed?"
       (testing "failed? is valid on nullable"
-        (is (false? (failed? nil)))
-        (is (= "nil" (message nil))))
+        (is (false? (f/failed? nil)))
+        (is (= "nil" (f/message nil))))
 
       (testing "failed? is valid on exception"
-        (is (true? (failed? (Exception. "Failed"))))
-        (is (= "My Message" (message (Exception. "My Message")))))
+        (is (true? (f/failed? #?(:clj (Exception. "Failed")
+                                 :cljs (js/Error. "Failed")))))
+        (is (= "My Message" (f/message #?(:clj (Exception. "My Message")
+                                          :cljs (js/Error. "My Message"))))))
 
       (testing "failed? is valid on failure"
-        (is (true? (failed? (fail "You failed."))))
-        (is (= "You failed." (message (fail "You failed."))))))
+        (is (true? (f/failed? (f/fail "You failed."))))
+        (is (= "You failed." (f/message (f/fail "You failed."))))))
 
     (testing "if-let-ok?"
 
       (is (= "Hello"
-             (if-let-ok? [v "Hello"] v)))
+             (f/if-let-ok? [v "Hello"] v)))
 
-      (is (failed?
-            (if-let-ok? [v (fail "FAIL")] "OK")))
+      (is (f/failed?
+            (f/if-let-ok? [v (f/fail "FAIL")] "OK")))
 
       (is (= "Hello"
-             (if-let-ok? [v :ok] "Hello" "Goodbye")))
+             (f/if-let-ok? [v :ok] "Hello" "Goodbye")))
 
       (is (= "Goodbye"
-             (if-let-ok? [v (fail "Hello")] "Hello" "Goodbye")))
+             (f/if-let-ok? [v (f/fail "Hello")] "Hello" "Goodbye")))
 
-      (is (= (fail "Fail")
-                (if-let-failed? [{:keys [y]} (fail "Something went wrong!")]
-                              (fail "Fail")))))
+      (is (= (f/fail "Fail")
+             (f/if-let-failed? [{:keys [y]} (f/fail "Something went wrong!")]
+                              (f/fail "Fail")))))
 
     (testing "when-let-ok?"
       (let [result (atom nil)]
         (is (= "Hello"
-               (when-let-ok? [v "Hello"]
+               (f/when-let-ok? [v "Hello"]
                  (reset! result :ok)
                  v)))
         (is (= :ok @result)))
 
       (let [result (atom nil)]
-        (is (failed?
-              (when-let-ok? [v (fail "FAIL")]
+        (is (f/failed?
+              (f/when-let-ok? [v (f/fail "FAIL")]
                 (reset! result :ok)
                 "OK")))
         (is (nil? @result))
@@ -169,25 +185,25 @@
     (testing "if-let-failed?"
 
       (is (= "Hello"
-             (if-let-failed? [v "Hello"] "FAILED" v)))
+             (f/if-let-failed? [v "Hello"] "FAILED" v)))
 
-      (is (failed?
-            (if-let-failed? [v (fail "FAIL")] v)))
+      (is (f/failed?
+            (f/if-let-failed? [v (f/fail "FAIL")] v)))
 
-      (is (ok?
-            (if-let-failed? [v "Didn't fail"] v)))
+      (is (f/ok?
+            (f/if-let-failed? [v "Didn't fail"] v)))
 
       (is (= "Goodbye"
-             (if-let-failed? [v :ok] "Hello" "Goodbye")))
+             (f/if-let-failed? [v :ok] "Hello" "Goodbye")))
 
       (is (= "Hello"
-             (if-let-failed? [v (fail "Hello")] "Hello" "Goodbye")))
+             (f/if-let-failed? [v (f/fail "Hello")] "Hello" "Goodbye")))
       )
 
     (testing "when-let-failed?"
       (let [result (atom nil)]
         (is (= "Hello"
-              (when-let-failed?
+              (f/when-let-failed?
                 [v "Hello"]
                 (reset! result :ok)
                 v)))
@@ -195,8 +211,8 @@
 
       (let [result (atom nil)]
         (is (= "OK"
-              (when-let-failed?
-                [v (fail "FAIL")]
+              (f/when-let-failed?
+                [v (f/fail "FAIL")]
                 (reset! result :ok)
                 "OK")))
         (is (= :ok @result))))
@@ -204,8 +220,8 @@
   (testing "Assertions"
     ;; assert-some? basically covers everything
     (testing "Assert some?"
-      (is (= (fail "msg") (assert-some? nil "msg")))
-      (is (= "it" (assert-some? "it" "msg"))))))
+      (is (= (f/fail "msg") (f/assert-some? nil "msg")))
+      (is (= "it" (f/assert-some? "it" "msg"))))))
 
 
 

@@ -1,7 +1,9 @@
-(ns failjure.core)
+(ns failjure.core
+  #?@(:cljs [(:require [goog.string :refer [format]]
+                       [goog.string.format])]))
 
-; Public API
-; failed?, message part of protocol
+                                        ; Public API
+                                        ; failed?, message part of protocol
 (declare fail)
 (declare attempt-all)
 (declare if-failed)
@@ -20,19 +22,27 @@
   (failed? [self] false)
   (message [self] "nil")
 
-  Object
-  (failed? [self] false)
-  (message [self] (str self))
+  #?@(:clj [Object
+            (failed? [self] false)
+            (message [self] (str self))
 
-  Exception
-  (failed? [self] true)
-  (message [self] (.getMessage self)))
+            Exception
+            (failed? [self] true)
+            (message [self] (.getMessage self))]
+
+      :cljs [default
+             (failed? [self] false)
+             (message [self] (str self))
+
+             js/Error
+             (failed? [self] true)
+             (message [self] (.-message self))]))
 
 
 (defn ok? [v] (not (failed? v)))
 
 
-; Define a failure
+                                        ; Define a failure
 (defrecord Failure [message]
   HasFailed
   (failed? [self] true)
@@ -40,16 +50,22 @@
 
 
 (defn fail
- ([msg] (->Failure msg))
- ([msg & fmt-parts]
-  (->Failure (apply format msg fmt-parts))))
+  ([msg] (->Failure msg))
+  ([msg & fmt-parts]
+   (->Failure (apply format msg fmt-parts))))
 
 
-; Exceptions are failures too, make them easier
+                                        ; Exceptions are failures too, make them easier
 (defmacro try* [& body]
   `(try
      ~@body
      (catch Exception e# e#)))
+
+
+(defmacro try-cljs* [& body]
+  `(try
+     ~@body
+     (catch :default e# e#)))
 
 
 ;; Validating binding macros
@@ -73,7 +89,7 @@
   (fail \"Goodbye\")"
   ([[v-sym form] ok-branch]
    `(let [result# ~form]
-     (if-let-ok? [~v-sym result#] ~ok-branch result#)))
+      (if-let-ok? [~v-sym result#] ~ok-branch result#)))
   ([[v-sym form] ok-branch failed-branch]
    `(let [result# ~form
           ~v-sym result#]
@@ -92,7 +108,7 @@
   Returns the error in case of failure"
   [[v-sym form] & ok-branches]
   `(if-let-ok? [~v-sym ~form]
-               (do ~@ok-branches)))
+     (do ~@ok-branches)))
 
 (defmacro if-let-failed?
   "Inverse of if-let-ok?
@@ -141,14 +157,14 @@
   {:added "0.1.3"}
   [arglist & body]
   `(with-meta (fn ~arglist ~@body)
-              {:else-fn? true}))
+     {:else-fn? true}))
 
 (defmacro if-failed
   "DEPRECATED: Use when-failed instead"
   {:deprecated "0.1.3"}
   [arglist & body]
   `(with-meta (fn ~arglist ~@body)
-              {:else-fn? true}))
+     {:else-fn? true}))
 
 (defn else* [else-part result]
   (if (:else-fn? (meta else-part))
@@ -187,8 +203,8 @@
    (attempt-all* bindings return))
   ([bindings return else]
    `(if-let-failed? [result# (attempt-all ~bindings ~return)]
-                    (else* ~else result#)
-                    result#)))
+      (else* ~else result#)
+      result#)))
 
 (defn- try-wrap
   [bindings]

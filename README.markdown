@@ -3,7 +3,7 @@
 [![Travis](https://img.shields.io/travis/adambard/failjure.svg?maxAge=2592000)](https://travis-ci.org/adambard/failjure)
 [![Clojars Project](https://img.shields.io/clojars/v/failjure.svg)](https://clojars.org/failjure)
 
-Failjure is a utility library for working with failed computations in Clojure.
+Failjure is a utility library for working with failed computations in Clojure(Script).
 It provides an alternative to exception-based error handling for applications
 where functional purity is more important.
 
@@ -67,7 +67,7 @@ format function) and creates a Failure object.
 
 These two functions are part of the `HasFailed` protocol underpinning
 failjure. `failed?` will tell you if a value is a failure (that is,
-a `Failure` or a java `Exception`.
+a `Failure`, a java `Exception` or a JavaScript `Error`.
 
 ### `attempt-all`
 
@@ -200,6 +200,10 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 
 ## Changelog
+
+#### 1.6.0-SNAPSHOT
+
+Added ClojureScript support.
 
 #### 1.5.0
 
