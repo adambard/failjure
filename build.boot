@@ -28,6 +28,11 @@
     (build-jar)
     (target "build")))
 
+(deftask deploy-snapshot []
+  (comp
+    (build-jar)
+    (push-snapshot)))
+
 (deftask deploy-clojars []
   (comp
     (build-jar)
