@@ -23,6 +23,11 @@
        :scm            {:url "https://github.com/adambard/failjure"}
        :license        {"Eclipse Public License" "http://www.eclipse.org/legal/epl-v10.html"}})
 
+(deftask build []
+  (comp
+    (build-jar)
+    (target "build")))
+
 (deftask deploy-clojars []
   (comp
     (build-jar)
