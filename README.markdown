@@ -201,9 +201,17 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 ## Changelog
 
-#### 1.6.0-SNAPSHOT
+#### 2.0.0
 
-Added ClojureScript support.
+Added ClojureScript support. Since the jar now includes .cljc instead of .clj files, which could
+break older builds, I've decided this should be a major version. It should in general be totally
+backwards-compatible though.
+
+Notable changes:
+
+* ClojureScript support (thanks @snorremd)
+* `*try` now wraps its inputs in a function and returns `(try-fn *wrapped-fn*)`. This was necessary
+  to keep the clj and cljs APIs consistent, but could break some existing use cases (probably).
 
 #### 1.5.0
 

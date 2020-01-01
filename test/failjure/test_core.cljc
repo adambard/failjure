@@ -21,22 +21,16 @@
                              ]
                             (str x y)))))
 
-    #?(:clj
-       (testing "Returns the exception for try*"
-         (let [result (f/attempt-all [x "O"
-                                    y (f/try* (Integer/parseInt "k"))
-                                    z (is false "Did not short-circuit")]
-                                   (str x y z))]
-           (is (f/failed? result))
-           (is (instance? NumberFormatException result))))
-       :cljs
-       (testing "Returns the error for try-cljs*"
-         (let [result (f/attempt-all [x 0
-                                      y (f/try-cljs* (throw (js/Error. "Fails")))
-                                      z (is false "Did not short-circuit")]
-                                     (str x y z))]
-           (is (f/failed? result))
-           (is (instance? js/Error result)))))
+    
+    (testing "Returns the exception for try*"
+      (let [result (f/attempt-all [x "O"
+                                y (f/try* #?(:clj (Integer/parseInt "k")
+                                             :cljs (throw (js/Error. "Fails."))))
+                                z (is false "Did not short-circuit")]
+                                (str x y z))]
+        (is (f/failed? result))
+        #?(:clj (is (instance? NumberFormatException result))
+           :cljs (is (instance? js/Error result)))))
 
     (testing "Runs when-failed"
                                         ; Runs when-failed
@@ -59,14 +53,23 @@
                             (f/message e))))))
 
     #?(:clj
-       (testing "NumberFormatException"
+       (testing "attempt-all does not catch exceptions automatically"
          (is (= "Caught"
                 (try
                   (f/attempt-all [x "O"
                                 y (Integer/parseInt "k")]
                                "Ok"
                                "Failed")
-                  (catch NumberFormatException e "Caught"))))))
+                  (catch NumberFormatException e "Caught")))))
+       :cljs
+       (testing "attempt-all does not catch exceptions automatically"
+         (is (= "Caught"
+                (try
+                  (f/attempt-all [x "O"
+                                y (throw (js/Error. "Some error"))]
+                               "Ok"
+                               "Failed")
+                  (catch :default e "Caught"))))))
 
     (testing "Destructuring in fail cases should return the failure"
       (is (= (f/fail "Fail")
@@ -74,19 +77,18 @@
                            {:keys [y]} (f/fail "Fail")]
                           y))))
 
-    #?(:clj
-       (testing "try-all safely catches an exception in the bindings"
-         (is (f/failed? (f/try-all [x (/ 4 0)
-                                    y (+ 3 4)]
-                                   (+ x y))))))
+    (testing "try-all safely catches an exception in the bindings"
+      (is (f/failed? (f/try-all [x #?(:clj (/ 4 0) :cljs (throw (js/Error. "Error")))
+                                 y (+ 3 4)]
+                                (+ x y)))))
 
-    #?(:clj
-       (testing "try-all safely catches an exception in the bindings with else clause"
-         (is (= "Divide by zero"
-                (f/try-all [x (/ 4 0)
-                            y (+ 3 4)]
-                           (+ x y)
-                           (f/when-failed [err] (f/message err))))))))
+    (testing "try-all safely catches an exception in the bindings with else clause"
+      (is (= "Divide by zero"
+             (f/try-all [x #?(:clj (/ 4 0) :cljs (throw (js/Error. "Divide by zero")))
+                         y (+ 3 4)]
+                        (+ x y)
+                        (f/when-failed [err] (f/message err))))))
+    )
 
                                         ; Test ok-> (and therefore attempt->)
   (testing "ok->"

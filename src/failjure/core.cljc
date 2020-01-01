@@ -2,8 +2,8 @@
   #?@(:cljs [(:require [goog.string :refer [format]]
                        [goog.string.format])]))
 
-                                        ; Public API
-                                        ; failed?, message part of protocol
+; Public API
+; failed?, message part of protocol
 (declare fail)
 (declare attempt-all)
 (declare if-failed)
@@ -42,7 +42,7 @@
 (defn ok? [v] (not (failed? v)))
 
 
-                                        ; Define a failure
+; Define a failure
 (defrecord Failure [message]
   HasFailed
   (failed? [self] true)
@@ -55,17 +55,15 @@
    (->Failure (apply format msg fmt-parts))))
 
 
-                                        ; Exceptions are failures too, make them easier
+(defn try-fn [body-fn]
+  (try
+     (body-fn)
+     (catch #?(:clj Exception :cljs :default) e# e#)))
+
+
+; Exceptions are failures too, make them easier
 (defmacro try* [& body]
-  `(try
-     ~@body
-     (catch Exception e# e#)))
-
-
-(defmacro try-cljs* [& body]
-  `(try
-     ~@body
-     (catch :default e# e#)))
+  `(try-fn (fn [] ~@body)))
 
 
 ;; Validating binding macros
@@ -209,7 +207,7 @@
 (defn- try-wrap
   [bindings]
   (map-indexed #(if (odd? %1)
-                  `(try* ~%2)
+                  `(try-fn (fn [] ~%2))
                   %2)
                bindings))
 

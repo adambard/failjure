@@ -12,7 +12,7 @@
          '[adzerk.boot-test :refer :all]
          '[crisptrutski.boot-cljs-test :refer [test-cljs]])
 
-(def +version+ "1.6.0-SNAPSHOT")
+(def +version+ "2.0.0-SNAPSHOT")
 (bootlaces! +version+)
 
 (task-options!
