@@ -118,6 +118,26 @@
               (swap! a inc)
               inc)))))
 
+  (testing "as-ok->"
+    (is (= "Ok!"
+           (f/as-ok-> "k" a
+                      (str a "!")
+                      (str "O" a))))
+    (is (= "foo"
+           (let [func (constantly (f/fail "foo"))
+                 result (f/as-ok-> "k" a
+                                   (str a "!")
+                                   (func a)
+                                   (str "O" a))]
+                (f/message result))))
+    (is (= "foo"
+           (let [func (constantly (f/fail "foo"))
+                 result (f/as-ok-> "k" a
+                                   (str a "!")
+                                   (str "O" a)
+                                   (func a))]
+                (f/message result)))))
+
                                         ; Test attempt->>
   (testing "ok->>"
     (is (= "Ok"

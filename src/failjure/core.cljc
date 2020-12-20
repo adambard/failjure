@@ -257,6 +257,15 @@
       v#
       (attempt->> v# ~@forms))))
 
+(defmacro as-ok->
+  "Like as-> but with ok? "
+  [expr name & forms]
+  `(attempt-all [~name ~expr
+                 ~@(interleave (repeat name) (butlast forms))]
+    ~(if (empty? forms)
+       name
+       (last forms))))
+
 ;; Assertions: Helpers
 
 (defn assert-with
