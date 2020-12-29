@@ -54,6 +54,13 @@
   ([msg & fmt-parts]
    (->Failure (apply format msg fmt-parts))))
 
+(defn attempt
+  "Accepts a (possibly failed) value and an error-handling function"
+  {:added "2.1"}
+  [val-or-failed handle-fn]
+  (if (failed? val-or-failed)
+    (handle-fn val-or-failed)
+    val-or-failed))
 
 (defn try-fn [body-fn]
   (try
@@ -259,6 +266,7 @@
 
 (defmacro as-ok->
   "Like as-> but with ok? "
+  {:added "2.1"}
   [expr name & forms]
   `(attempt-all [~name ~expr
                  ~@(interleave (repeat name) (butlast forms))]

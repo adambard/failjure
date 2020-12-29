@@ -52,6 +52,19 @@ if you're into that sort of thing:
 
 ## Quick Reference
 
+### `HasFailed`
+
+The cornerstone of this library, `HasFailed` is the protocol that describes a failed result.
+Failjure implements HasFailed for Object (the catch-all not-failed implementation), Exception, and the
+built-in Failure record type, but you can add your own very easily:
+
+```clojure
+(defrecord AnnotatedFailure [message data]
+  f/HasFailed
+  (failed? [self] true)
+  (message [self] (:message self)))
+```
+
 ### `fail`
 
 `fail` is the basis of this library. It accepts an error message
@@ -68,6 +81,21 @@ format function) and creates a Failure object.
 These two functions are part of the `HasFailed` protocol underpinning
 failjure. `failed?` will tell you if a value is a failure (that is,
 a `Failure`, a java `Exception` or a JavaScript `Error`.
+
+### `attempt`
+
+_Added in 2.1_
+
+Accepts a value and a function. If the value is a failure, it is passed
+to the function and the result is returned. Otherwise, value is returned.
+
+```clojure
+(defn handle-error [e] (str "Error: " (f/message e)))
+(f/attempt handle-error "Ok")  ;=> "Ok"
+(f/attempt handle-error (f/fail "failure"))  ;=> "Error: failure"
+```
+
+Try it with `partial`!
 
 ### `attempt-all`
 
@@ -120,6 +148,24 @@ correct this shortcoming*
     (handle-failure result)))
 ```
 
+### `as-ok->`
+
+_Added in 2.1_
+
+Like clojure's built-in `as->`, but short-circuits on failures.
+
+```clojure
+
+(f/as-ok-> "k" $
+  (str $ "!")
+  (str "O" $))) ; => Ok!
+
+(f/as-ok-> "k" $
+  (str $ "!")
+  (f/try* (Integer/parseInt $))
+  (str "O" $))) ; => Returns (does not throw) a NumberFormatException
+```
+
 ### `try*`
 
 This library does not handle exceptions by default. However,
@@ -143,19 +189,6 @@ bindings in a `try*` is available as `try-all` (thanks @lispyclouds):
 (try-all [x (/ 1 0)
           y (* 2 3)]
   y)  ; => java.lang.ArithmeticException (returned, not thrown)
-```
-
-### `HasFailed`
-
-`HasFailed` is the protocol that describes a failed result. This library implements
-HasFailed for Object (the catch-all not-failed implementation), Exception, and the
-built-in Failure record type, but you can add your own very easily:
-
-```clojure
-(defrecord AnnotatedFailure [message data]
-  f/HasFailed
-  (failed? [self] true)
-  (message [self] (:message self)))
 ```
 
 ### `(if-|when-)-let-(ok?|failed?)`
@@ -200,6 +233,10 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 
 ## Changelog
+
+#### 2.1.0
+
+Added `attempt` and `as-ok->`. Changed from boot to leiningen for builds.
 
 #### 2.0.0
 

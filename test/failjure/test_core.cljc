@@ -5,6 +5,11 @@
                        [failjure.core :as f :include-macros true]])))
 
 (deftest failjure-core-test
+  (testing "attempt"
+    (let [handle-error #(str "Error: " (f/message %))]
+    (is (= "Ok" (f/attempt handle-error "Ok")))
+    (is (= "Error: failed" (f/attempt handle-error (f/fail "failed"))))))
+
   (testing "attempt-all"
     (testing "basically works"
       (is (= "Ok"
@@ -21,7 +26,6 @@
                              ]
                             (str x y)))))
 
-    
     (testing "Returns the exception for try*"
       (let [result (f/attempt-all [x "O"
                                 y (f/try* #?(:clj (Integer/parseInt "k")
