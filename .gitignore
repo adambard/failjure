@@ -1,9 +1,12 @@
+# jenv
 .java-version
-.nrepl-history
+
+# lein junk
 target
+out/
 .nrepl-port
-.cljs_node_repl
-src/scratch.clj
+.nrepl-history
 .lein-failures
 .lein-repl-history
-out/
+pom.xml
+pom.xml.asc
