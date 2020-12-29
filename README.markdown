@@ -234,7 +234,14 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 ## Changelog
 
+#### 2.1.1
+
+Fix a deployment whoopsie causing `attempt` to have reversed argument order from what is documented
+here. It was fine in my REPL, I swear!
+
 #### 2.1.0
+
+**USE 2.1.1 INSTEAD**
 
 Added `attempt` and `as-ok->`. Changed from boot to leiningen for builds.
 

@@ -55,9 +55,9 @@
    (->Failure (apply format msg fmt-parts))))
 
 (defn attempt
-  "Accepts a (possibly failed) value and an error-handling function"
+  "Accepts an error-handling function and a (possibly failed) value"
   {:added "2.1"}
-  [val-or-failed handle-fn]
+  [handle-fn val-or-failed]
   (if (failed? val-or-failed)
     (handle-fn val-or-failed)
     val-or-failed))

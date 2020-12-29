@@ -1,4 +1,4 @@
-(defproject failjure "2.1.0"
+(defproject failjure "2.1.1"
   :description "Simple helpers for treating failures as values"
   :url         "https://github.com/adambard/failjure"
   :license     {:name "Eclipse Public License"
