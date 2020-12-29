@@ -4,3 +4,6 @@ target
 .nrepl-port
 .cljs_node_repl
 src/scratch.clj
+.lein-failures
+.lein-repl-history
+out/
