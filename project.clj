@@ -1,4 +1,4 @@
-(defproject failjure "2.1.1"
+(defproject failjure "2.2.0"
   :description "Simple helpers for treating failures as values"
   :url         "https://github.com/adambard/failjure"
   :license     {:name "Eclipse Public License"
@@ -10,6 +10,8 @@
 
   :plugins [[lein-cljsbuild "1.1.8"]
             [lein-doo "0.1.10"]]
+
+  :aot [failjure.core]
 
   :profiles
   {:provided {:dependencies [[org.clojure/clojure       "1.10.1"]

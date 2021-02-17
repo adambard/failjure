@@ -234,6 +234,10 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 ## Changelog
 
+#### 2.2.0
+
+(Re-)added AOT compilation to the new leiningen project. This may help resolve errors with some project configurations.
+
 #### 2.1.1
 
 Fix a deployment whoopsie causing `attempt` to have reversed argument order from what is documented
