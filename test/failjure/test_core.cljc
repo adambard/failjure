@@ -243,6 +243,60 @@
                 "OK")))
         (is (= :ok @result))))
 
+  (testing "cond-ok->"
+    (is (= "Goodbye"
+           (f/cond-ok->
+            "Good"
+            true (str "b")
+            true (str "y")
+            true (str "e"))))
+    (is (= "Goodbye"
+           (f/cond-ok->
+            "Good"
+            true (str "b")
+            false (str "!")
+            true (str "y")
+            false (str "!")
+            true (str "e"))))
+    (let [result (f/cond-ok->
+                  "Good"
+                  true (str "b")
+                  false (str "!")
+                  true (str "y")
+                  false (str "!")
+                  true (str "e")
+                  true f/fail
+                  true (str "!"))]
+      (is (f/failed? result))
+      (is (= "Goodbye" (f/message result)))))
+
+  (testing "cond-ok->>"
+    (is (= "Hello"
+           (f/cond-ok->>
+            "lo"
+            true (str "l")
+            true (str "e")
+            true (str "H"))))
+    (is (= "Hello"
+           (f/cond-ok->>
+            "lo"
+            true (str "l")
+            false (str "!")
+            true (str "e")
+            false (str "!")
+            true (str "H"))))
+    (let [result (f/cond-ok->>
+                  "lo"
+                  true (str "l")
+                  false (str "!")
+                  true (str "e")
+                  false (str "!")
+                  true (str "H")
+                  true f/fail
+                  true (str "!"))]
+      (is (f/failed? result))
+      (is (= "Hello" (f/message result)))))
+
   (testing "Assertions"
     ;; assert-some? basically covers everything
     (testing "Assert some?"
