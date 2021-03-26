@@ -1,6 +1,6 @@
 # Failjure
 
-![Run Tests](https://github.com/adambard/failjure/workflows/Run%20Tests/badge.svg)
+[![Run Tests](https://github.com/adambard/failjure/actions/workflows/ci.yml/badge.svg)](https://github.com/adambard/failjure/actions/workflows/ci.yml)
 [![Clojars Project](https://img.shields.io/clojars/v/failjure.svg)](https://clojars.org/failjure)
 
 Failjure is a utility library for working with failed computations in Clojure(Script).
