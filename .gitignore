@@ -10,3 +10,6 @@ out/
 .lein-repl-history
 pom.xml
 pom.xml.asc
+
+# clj kondo
+/.clj-kondo/.cache
