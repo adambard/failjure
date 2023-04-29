@@ -235,6 +235,10 @@ are provided, but if you like, adding your own is as easy as `(def assert-my-pre
 
 ## Changelog
 
+#### 2.3.0
+
+Added clj-kondo support and indent annotations.
+
 #### 2.2.0
 
 (Re-)added AOT compilation to the new leiningen project. This may help resolve errors with some project configurations.
