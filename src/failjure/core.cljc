@@ -92,6 +92,7 @@
 
   Note that the above is identical in function to simply calling
   (fail \"Goodbye\")"
+  {:style/indent 1}
   ([[v-sym form] ok-branch]
    `(let [result# ~form]
       (if-let-ok? [~v-sym result#] ~ok-branch result#)))
@@ -111,6 +112,7 @@
       (do-something v))
 
   Returns the error in case of failure"
+  {:style/indent 1}
   [[v-sym form] & ok-branches]
   `(if-let-ok? [~v-sym ~form]
      (do ~@ok-branches)))
@@ -127,6 +129,7 @@
     (if-let-failed? [v \"Hello\"]
       (prn \"V Failed!\"))  ;; => returns \"Hello\"
   "
+  {:style/indent 1}
   ([[v-sym form] failed-branch]
    `(if-let-ok? [~v-sym ~form] ~v-sym ~failed-branch))
   ([[v-sym form] failed-branch ok-branch]
@@ -140,14 +143,9 @@
       (handle-failure v))
 
   Returns the value in case of non-failure"
+  {:style/indent 1}
   [[v-sym form] & failed-branches]
-  `(if-let-failed? [~v-sym ~form] (do ~@failed-branches))
-  )
-
-
-
-
-
+  `(if-let-failed? [~v-sym ~form] (do ~@failed-branches)))
 
 (defmacro when-failed
   "Use in combination with `attempt-all`. If any binding in `attempt-all` failed,
@@ -159,14 +157,16 @@
     ; do something
     (when-failed [e]
       (print \"ERROR:\" (message e))))"
-  {:added "0.1.3"}
+  {:added "0.1.3"
+   :style/indent 1}
   [arglist & body]
   `(with-meta (fn ~arglist ~@body)
      {:else-fn? true}))
 
 (defmacro if-failed
   "DEPRECATED: Use when-failed instead"
-  {:deprecated "0.1.3"}
+  {:deprecated "0.1.3"
+   :style/indent 1}
   [arglist & body]
   `(with-meta (fn ~arglist ~@body)
      {:else-fn? true}))
@@ -201,9 +201,8 @@
                   y (fail \"Fail\")]
       x
       (when-failed [e]
-        (message e))) ; => \"Fail\"
-
-  "
+        (message e))) ; => \"Fail\""
+  {:style/indent 1}
   ([bindings return]
    (attempt-all* bindings return))
   ([bindings return else]
@@ -222,6 +221,7 @@
   "Similar to `attempt-all` but catches possible exceptions.
 
   Wraps each arm of the binding in a `try*` to treat them as Failures and short circuit."
+  {:style/indent 1}
   ([bindings return]
    (attempt-all* (try-wrap bindings) return))
   ([bindings return else]
@@ -266,13 +266,14 @@
 
 (defmacro as-ok->
   "Like as-> but with ok? "
-  {:added "2.1"}
+  {:added "2.1"
+   :style/indent 2}
   [expr name & forms]
   `(attempt-all [~name ~expr
                  ~@(interleave (repeat name) (butlast forms))]
-    ~(if (empty? forms)
-       name
-       (last forms))))
+     ~(if (empty? forms)
+        name
+        (last forms))))
 
 ;; Assertions: Helpers
 
