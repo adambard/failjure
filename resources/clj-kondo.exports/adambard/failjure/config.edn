@@ -1,0 +1,11 @@
+{:lint-as {failjure.core/ok->             clojure.core/->
+           failjure.core/ok->>            clojure.core/->>
+           failjure.core/try-all          clojure.core/let
+           failjure.core/try*             clojure.core/try
+           failjure.core/when-failed      clojure.core/fn
+           failjure.core/if-failed        clojure.core/fn
+           failjure.core/attempt-all      clojure.core/let
+           failjure.core/if-let-ok?       clojure.core/if-let
+           failjure.core/if-let-failed?   clojure.core/if-let
+           failjure.core/when-let-failed? clojure.core/when-let
+           failjure.core/when-let-ok?     clojure.core/when-let}}
