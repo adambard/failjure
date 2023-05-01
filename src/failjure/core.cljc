@@ -275,6 +275,30 @@
         name
         (last forms))))
 
+(defmacro cond-ok->
+  "Like cond-> but with ok? "
+  [expr & clauses]
+  (let [g (gensym)
+        steps (map (fn [[test step]] `(if ~test (-> ~g ~step) ~g))
+                   (partition 2 clauses))]
+    `(attempt-all [~g ~expr
+                   ~@(interleave (repeat g) (butlast steps))]
+       ~(if (empty? steps)
+          g
+          (last steps)))))
+
+(defmacro cond-ok->>
+  "Like cond->> but with ok? "
+  [expr & clauses]
+  (let [g (gensym)
+        steps (map (fn [[test step]] `(if ~test (->> ~g ~step) ~g))
+                   (partition 2 clauses))]
+    `(attempt-all [~g ~expr
+                   ~@(interleave (repeat g) (butlast steps))]
+       ~(if (empty? steps)
+          g
+          (last steps)))))
+
 ;; Assertions: Helpers
 
 (defn assert-with
