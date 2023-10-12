@@ -1,7 +1,6 @@
 {:lint-as {failjure.core/ok->             clojure.core/->
            failjure.core/ok->>            clojure.core/->>
            failjure.core/try-all          clojure.core/let
-           failjure.core/try*             clojure.core/try
            failjure.core/when-failed      clojure.core/fn
            failjure.core/if-failed        clojure.core/fn
            failjure.core/attempt-all      clojure.core/let
